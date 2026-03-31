@@ -77,7 +77,7 @@ function GateHero() {
         <p
           style={{
             fontSize: 15,
-            color: "var(--text-4)",
+            color: "var(--text-3)",
             maxWidth: 380,
             lineHeight: 1.6,
           }}
@@ -108,7 +108,7 @@ function GateHero() {
                 borderTop: i > 0 ? "1px solid var(--border)" : "none",
               }}
             >
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-4)", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
                 {label}
               </span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: i === 0 ? "var(--red)" : "var(--text-3)" }}>

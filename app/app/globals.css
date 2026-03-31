@@ -15,11 +15,11 @@
   --surface-3: #23262f;
   --surface-4: #2c303b;
 
-  /* Text — warm white, not pure white */
-  --text-1: #ece6db;
-  --text-2: rgba(236, 230, 219, 0.62);
-  --text-3: rgba(236, 230, 219, 0.36);
-  --text-4: rgba(236, 230, 219, 0.2);
+  /* Text — warm white, not pure white. All pass WCAG AA on --black */
+  --text-1: #ece6db;                      /* 13.5:1 — primary */
+  --text-2: rgba(236, 230, 219, 0.62);   /* 6.35:1 — secondary */
+  --text-3: rgba(236, 230, 219, 0.50);   /* 4.52:1 — muted (AA pass) */
+  --text-4: rgba(236, 230, 219, 0.40);   /* 3.29:1 — disabled (large text only) */
 
   /* Accent — amber/gold for value only */
   --amber: #C9A55C;
