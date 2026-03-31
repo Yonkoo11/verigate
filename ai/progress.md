@@ -2,15 +2,16 @@
 
 ## Status: PHASE 1 GATE PASSED. Deployed and verified on BSC testnet.
 
-## Deployed Contracts (BSC Testnet, Chain 97)
-- **RWATokenFactory:** `0xf35bE6FFEBF91AcC27A78696cf912595C6b08AAA`
-- **RWAToken (rwGATE):** `0xfb2E49727D99F4A46a5BBa3D1C7B0522c081Aae8`
-- **ComplianceEngine:** `0xE5fe2B794E4C1370217e0269F124BaB39f9bbd51`
-- **CountryRestriction:** `0x8259e22A83e22B59Bf224709a96832c3Ce5121B4`
-- **AccreditedInvestor:** `0x65871B81EfbfB9D99A7DeA2f1436c25A35af6D46`
-- **MaxHolders:** `0x7962848AA6187151DF77F845d5b05262BF86b66a`
+## Deployed Contracts (BSC Testnet, Chain 97) — v2 (Verigate rebrand)
+- **RWATokenFactory:** `0x60aa769416EfBbc0A6BC9cb454758dE6f76D52B5` (verified on BSCScan)
+- **RWAToken (VGATE):** `0xE7f32bcBCDBBEf25900d5f9545C20CFC2d61A711`
+- **ComplianceEngine:** `0x5Bf71EEdA3CA10ae52de3eA4aeA4b14b9d0FDba7`
+- **CountryRestriction:** `0x742D04D05f303Cb95E805Fb6B8A6C5035e6c41f8`
+- **AccreditedInvestor:** `0x77C3c50106c84585d6242Cb44876aDE3a445ED26`
+- **MaxHolders:** `0xE5c8383bBDbf1767D285e12eAAB32038Fe6A1424`
 - **BAS Schema UID:** `0xa72370606965bcdb25a1930828933a52fdcb9c2c59742c2806b5af35d4e87989`
 - **Deployer:** `0xf9946775891a24462cD4ec885d0D4E2675C84355`
+- **Live Demo:** https://yonkoo11.github.io/verigate/
 
 ## Phase 1 Gate: PASSED
 - Transfer without attestation → Reverted (CountryRestriction: sender has no attestation)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useReadContract } from "wagmi";
-import { addresses, complianceEngineAbi, rwaTokenAbi } from "@/lib/contracts";
+import { addresses, complianceEngineAbi, rwaTokenAbi, BSC_TESTNET_EXPLORER } from "@/lib/contracts";
 
 function StatusBadge({
   ok,
@@ -62,6 +62,35 @@ function StatusBadge({
       >
         {label}
       </span>
+    </div>
+  );
+}
+
+const MODULE_ABI = [{ type: "function", name: "moduleInfo", inputs: [], outputs: [{ type: "string", name: "name" }, { type: "string", name: "description" }], stateMutability: "view" }] as const;
+
+function ModuleLabel({ address }: { address: string }) {
+  const { data } = useReadContract({
+    address: address as `0x${string}`,
+    abi: MODULE_ABI,
+    functionName: "moduleInfo",
+  });
+
+  const name = data ? (data as [string, string])[0] : null;
+
+  return (
+    <div className="flex items-center gap-2 py-1.5 px-3 rounded-[var(--radius-sm)] bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+      <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)]" />
+      <span className="text-xs font-medium text-[var(--text-primary)]">
+        {name ?? "Loading..."}
+      </span>
+      <a
+        href={`${BSC_TESTNET_EXPLORER}/address/${address}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[10px] font-mono text-[var(--text-muted)] hover:text-[var(--accent-blue)]"
+      >
+        {address.slice(0, 6)}...{address.slice(-4)}
+      </a>
     </div>
   );
 }
@@ -145,11 +174,9 @@ export function ComplianceStatus() {
               Active Compliance Modules
             </p>
             {modules && (modules as string[]).length > 0 ? (
-              <div className="space-y-1 mt-1">
+              <div className="space-y-1.5 mt-1">
                 {(modules as string[]).map((mod, i) => (
-                  <p key={i} className="text-xs font-mono text-[var(--text-secondary)]">
-                    {mod.slice(0, 6)}...{mod.slice(-4)}
-                  </p>
+                  <ModuleLabel key={i} address={mod} />
                 ))}
               </div>
             ) : (
