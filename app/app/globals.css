@@ -90,6 +90,121 @@ body {
   outline-offset: 2px;
 }
 
+/* ============================================================
+   LAYOUT COMPONENTS
+   ============================================================ */
+
+/* Gate Hero — split on desktop, stack on mobile */
+.gate-hero {
+  display: flex;
+  min-height: calc(100vh - 56px);
+  position: relative;
+}
+
+.gate-hero-denied {
+  flex: 0 0 58%;
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 48px 80px 64px;
+  position: relative;
+}
+
+.gate-hero-approved {
+  flex: 0 0 42%;
+  background: var(--surface-1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 64px 80px 48px;
+  position: relative;
+}
+
+.gate-line {
+  position: absolute;
+  left: 58%;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transform: translateX(-50%);
+}
+
+/* Dashboard grid */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-6);
+}
+
+/* Admin row */
+.admin-row {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-end;
+}
+
+/* ============================================================
+   RESPONSIVE — mobile first fixes
+   ============================================================ */
+@media (max-width: 768px) {
+  .gate-hero {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .gate-hero-denied,
+  .gate-hero-approved {
+    flex: none;
+    padding: 48px 24px;
+  }
+
+  .gate-line {
+    position: relative;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    height: 40px;
+    flex-direction: row;
+    transform: none;
+  }
+
+  .gate-line .gate-line-vertical {
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+  }
+
+  .gate-line .gate-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .gate-hero-denied,
+  .gate-hero-approved {
+    padding: 36px 20px;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

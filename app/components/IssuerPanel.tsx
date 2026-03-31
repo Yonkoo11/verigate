@@ -156,7 +156,7 @@ export function IssuerPanel() {
       </div>
 
       <Section title="Mint Tokens">
-        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+        <div className="admin-row">
           <div style={{ flex: 1 }}><Label>Recipient</Label><Input value={mintTo} onChange={setMintTo} placeholder="0x..." /></div>
           <div style={{ width: 140 }}><Label>Amount</Label><Input value={mintAmt} onChange={(v) => setMintAmt(v.replace(/[^0-9.]/g, ""))} placeholder="1000" /></div>
           <Btn onClick={doMint} disabled={!isAddress(mintTo) || !mintAmt || mintP}>{mintP ? "..." : "Mint"}</Btn>
@@ -165,7 +165,7 @@ export function IssuerPanel() {
       </Section>
 
       <Section title="Set Attestation UID">
-        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+        <div className="admin-row">
           <div style={{ flex: 1 }}><Label>Wallet</Label><Input value={attWallet} onChange={setAttWallet} placeholder="0x..." /></div>
           <div style={{ flex: 1 }}><Label>UID (bytes32)</Label><Input value={attUID} onChange={setAttUID} placeholder="0x..." /></div>
           <Btn onClick={doAtt} disabled={!isAddress(attWallet) || !attUID || attP}>{attP ? "..." : "Set"}</Btn>
@@ -174,7 +174,7 @@ export function IssuerPanel() {
       </Section>
 
       <Section title="Freeze / Unfreeze">
-        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+        <div className="admin-row">
           <div style={{ flex: 1 }}><Label>Address</Label><Input value={freezeAddr} onChange={setFreezeAddr} placeholder="0x..." /></div>
           <Btn onClick={doFreeze} disabled={!isAddress(freezeAddr) || freezeP}>{freezeP ? "..." : "Freeze"}</Btn>
           <Btn onClick={doUnfreeze} disabled={!isAddress(freezeAddr) || unfreezeP} variant="danger">{unfreezeP ? "..." : "Unfreeze"}</Btn>
@@ -197,7 +197,7 @@ export function IssuerPanel() {
               ))}
             </div>
           )}
-          <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+          <div className="admin-row">
             <div style={{ width: 100 }}>
               <Label>Code</Label>
               <Input value={country} onChange={(v) => setCountry(v.toUpperCase().slice(0, 2))} placeholder="US" style={{ textTransform: "uppercase" }} />
