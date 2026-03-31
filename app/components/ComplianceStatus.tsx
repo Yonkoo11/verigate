@@ -3,94 +3,72 @@
 import { useAccount, useReadContract } from "wagmi";
 import { addresses, complianceEngineAbi, rwaTokenAbi, BSC_TESTNET_EXPLORER } from "@/lib/contracts";
 
-function StatusBadge({
-  ok,
-  label,
-  loading,
-}: {
-  ok: boolean;
-  label: string;
-  loading: boolean;
-}) {
-  if (loading) {
-    return (
-      <div className="flex items-center gap-2 py-2">
-        <div className="w-4 h-4 rounded-full bg-[var(--border-primary)] animate-pulse" />
-        <span className="text-sm text-[var(--text-muted)]">{label}</span>
-      </div>
-    );
-  }
+const MODULE_ABI = [{ type: "function", name: "moduleInfo", inputs: [], outputs: [{ type: "string", name: "name" }, { type: "string", name: "description" }], stateMutability: "view" }] as const;
+
+function ModuleRow({ address: addr }: { address: string }) {
+  const { data } = useReadContract({
+    address: addr as `0x${string}`,
+    abi: MODULE_ABI,
+    functionName: "moduleInfo",
+  });
+  const name = data ? (data as [string, string])[0] : "Loading...";
+  const desc = data ? (data as [string, string])[1] : "";
 
   return (
-    <div className="flex items-center gap-2 py-2">
-      {ok ? (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          className="text-[var(--accent-green)] flex-shrink-0"
-        >
-          <circle cx="8" cy="8" r="8" fill="currentColor" opacity="0.15" />
-          <path
-            d="M5 8l2 2 4-4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ) : (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          className="text-[var(--accent-red)] flex-shrink-0"
-        >
-          <circle cx="8" cy="8" r="8" fill="currentColor" opacity="0.15" />
-          <path
-            d="M5.5 5.5l5 5M10.5 5.5l-5 5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      )}
-      <span
-        className={`text-sm ${ok ? "text-[var(--accent-green)]" : "text-[var(--accent-red)]"}`}
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "var(--sp-3)",
+      padding: "var(--sp-3) var(--sp-4)",
+      background: "var(--surface-2)",
+      marginBottom: "var(--sp-2)",
+    }}>
+      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 500, color: "var(--text-1)" }}>
+          {name}
+        </div>
+        {desc && (
+          <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>{desc}</div>
+        )}
+      </div>
+      <a
+        href={`${BSC_TESTNET_EXPLORER}/address/${addr}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)", textDecoration: "none" }}
       >
-        {label}
-      </span>
+        {addr.slice(0, 6)}...{addr.slice(-4)}
+      </a>
     </div>
   );
 }
 
-const MODULE_ABI = [{ type: "function", name: "moduleInfo", inputs: [], outputs: [{ type: "string", name: "name" }, { type: "string", name: "description" }], stateMutability: "view" }] as const;
-
-function ModuleLabel({ address }: { address: string }) {
-  const { data } = useReadContract({
-    address: address as `0x${string}`,
-    abi: MODULE_ABI,
-    functionName: "moduleInfo",
-  });
-
-  const name = data ? (data as [string, string])[0] : null;
-
+function StatusRow({ label, ok, text, loading }: { label: string; ok: boolean; text: string; loading: boolean }) {
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "var(--sp-3) 0" }}>
+        <span style={{ fontSize: 14, color: "var(--text-2)" }}>{label}</span>
+        <div style={{ width: 80, height: 16, background: "var(--surface-3)", opacity: 0.5 }} />
+      </div>
+    );
+  }
   return (
-    <div className="flex items-center gap-2 py-1.5 px-3 rounded-[var(--radius-sm)] bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
-      <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)]" />
-      <span className="text-xs font-medium text-[var(--text-primary)]">
-        {name ?? "Loading..."}
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--sp-3) 0" }}>
+      <span style={{ fontSize: 14, color: "var(--text-2)" }}>{label}</span>
+      <span style={{
+        display: "flex", alignItems: "center", gap: "var(--sp-2)",
+        fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 500,
+        color: ok ? "var(--green)" : "var(--red)",
+      }}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          {ok
+            ? <path d="M4 8l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            : <path d="M5 5l6 6M11 5l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          }
+        </svg>
+        {text}
       </span>
-      <a
-        href={`${BSC_TESTNET_EXPLORER}/address/${address}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[10px] font-mono text-[var(--text-muted)] hover:text-[var(--accent-blue)]"
-      >
-        {address.slice(0, 6)}...{address.slice(-4)}
-      </a>
     </div>
   );
 }
@@ -98,94 +76,58 @@ function ModuleLabel({ address }: { address: string }) {
 export function ComplianceStatus() {
   const { address } = useAccount();
 
-  const { data: hasAttestation, isLoading: attestLoading } = useReadContract({
-    address: addresses.complianceEngine,
-    abi: complianceEngineAbi,
-    functionName: "hasAttestation",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address && !!addresses.complianceEngine },
+  const { data: hasAttestation, isLoading: attLoad } = useReadContract({
+    address: addresses.complianceEngine, abi: complianceEngineAbi, functionName: "hasAttestation",
+    args: address ? [address] : undefined, query: { enabled: !!address && !!addresses.complianceEngine },
   });
-
   const { data: attestationUID } = useReadContract({
-    address: addresses.complianceEngine,
-    abi: complianceEngineAbi,
-    functionName: "attestationUIDs",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address && !!addresses.complianceEngine },
+    address: addresses.complianceEngine, abi: complianceEngineAbi, functionName: "attestationUIDs",
+    args: address ? [address] : undefined, query: { enabled: !!address && !!addresses.complianceEngine },
   });
-
-  const { data: isFrozen, isLoading: frozenLoading } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "frozen",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address && !!addresses.rwaToken },
+  const { data: isFrozen, isLoading: frozenLoad } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "frozen",
+    args: address ? [address] : undefined, query: { enabled: !!address && !!addresses.rwaToken },
   });
-
   const { data: modules } = useReadContract({
-    address: addresses.complianceEngine,
-    abi: complianceEngineAbi,
-    functionName: "getModules",
+    address: addresses.complianceEngine, abi: complianceEngineAbi, functionName: "getModules",
     query: { enabled: !!addresses.complianceEngine },
   });
 
-  const noEngine = !addresses.complianceEngine;
-
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--border-primary)] bg-[var(--bg-card)] p-6">
-      <h2 className="text-lg font-semibold mb-4">Compliance Status</h2>
+    <div style={{ background: "var(--surface-1)", border: "1px solid var(--border)", padding: "var(--sp-6)" }}>
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 500, color: "var(--text-1)", marginBottom: "var(--sp-5)" }}>
+        Compliance
+      </h2>
 
-      {noEngine ? (
-        <p className="text-sm text-[var(--text-muted)]">
-          No compliance engine configured. Set NEXT_PUBLIC_COMPLIANCE_ENGINE_ADDRESS in .env.
-        </p>
+      <div style={{ borderBottom: "1px solid var(--border)", marginBottom: "var(--sp-4)" }}>
+        <StatusRow label="BAS Attestation" ok={!!hasAttestation} text={hasAttestation ? "Verified" : "Not Found"} loading={attLoad} />
+        <StatusRow label="Freeze Status" ok={!isFrozen} text={isFrozen ? "Frozen" : "Active"} loading={frozenLoad} />
+      </div>
+
+      {/* Attestation UID */}
+      {typeof attestationUID === "string" && attestationUID !== "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
+        <div style={{ marginBottom: "var(--sp-4)" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: "var(--sp-1)" }}>
+            Attestation UID
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-2)", wordBreak: "break-all", lineHeight: 1.5 }}>
+            {attestationUID}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Active Modules */}
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: "var(--sp-3)" }}>
+        Active Modules
+      </div>
+      {Array.isArray(modules) && modules.length > 0 ? (
+        <div>
+          {(modules as string[]).map((mod, i) => (
+            <ModuleRow key={i} address={mod} />
+          ))}
+        </div>
       ) : (
-        <>
-          <div className="space-y-1 mb-4">
-            <StatusBadge
-              ok={!!hasAttestation}
-              label={
-                hasAttestation
-                  ? "BAS attestation verified"
-                  : "No BAS attestation found"
-              }
-              loading={attestLoading}
-            />
-            <StatusBadge
-              ok={!isFrozen}
-              label={isFrozen ? "Address is frozen" : "Address is not frozen"}
-              loading={frozenLoading}
-            />
-          </div>
-
-          {attestationUID && attestationUID !== "0x0000000000000000000000000000000000000000000000000000000000000000" && (
-            <div className="mt-3 pt-3 border-t border-[var(--border-primary)]">
-              <p className="text-xs text-[var(--text-muted)] mb-1">
-                Attestation UID
-              </p>
-              <p className="text-xs font-mono text-[var(--text-secondary)] break-all">
-                {attestationUID as string}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-3 pt-3 border-t border-[var(--border-primary)]">
-            <p className="text-xs text-[var(--text-muted)] mb-1">
-              Active Compliance Modules
-            </p>
-            {modules && (modules as string[]).length > 0 ? (
-              <div className="space-y-1.5 mt-1">
-                {(modules as string[]).map((mod, i) => (
-                  <ModuleLabel key={i} address={mod} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-[var(--text-muted)]">
-                No modules registered
-              </p>
-            )}
-          </div>
-        </>
+        <p style={{ fontSize: 13, color: "var(--text-3)" }}>No modules registered</p>
       )}
     </div>
   );

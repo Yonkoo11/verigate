@@ -1,61 +1,98 @@
 @import "tailwindcss";
 
+/* ============================================================
+   VERIGATE DESIGN SYSTEM
+   Hybrid: P2 gate metaphor + P3 serif authority + P1 sizing
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #111827;
-  --bg-card: #1a2035;
-  --bg-card-hover: #1f2847;
-  --border-primary: #2a3555;
-  --border-accent: #4f6ef7;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-blue: #4f6ef7;
-  --accent-purple: #8b5cf6;
-  --accent-green: #22c55e;
-  --accent-red: #ef4444;
-  --accent-amber: #f59e0b;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --space-unit: 4px;
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
+  /* Surfaces — warm charcoal progression */
+  --black: #0b0d11;
+  --surface-1: #12141a;
+  --surface-2: #1a1d25;
+  --surface-3: #23262f;
+  --surface-4: #2c303b;
+
+  /* Text — warm white, not pure white */
+  --text-1: #ece6db;
+  --text-2: rgba(236, 230, 219, 0.62);
+  --text-3: rgba(236, 230, 219, 0.36);
+  --text-4: rgba(236, 230, 219, 0.2);
+
+  /* Accent — amber/gold for value only */
+  --amber: #C9A55C;
+  --amber-dim: rgba(201, 165, 92, 0.12);
+  --amber-border: rgba(201, 165, 92, 0.22);
+  --amber-hover: #d4b46a;
+  --amber-glow: rgba(201, 165, 92, 0.06);
+
+  /* Semantic */
+  --green: #34d399;
+  --green-dim: rgba(52, 211, 153, 0.1);
+  --green-border: rgba(52, 211, 153, 0.18);
+  --red: #f87171;
+  --red-dim: rgba(248, 113, 113, 0.1);
+  --red-border: rgba(248, 113, 113, 0.18);
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  --font-serif: 'Crimson Pro', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  /* Spacing — 4px grid */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration: 150ms;
 }
 
-* {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: system-ui, -apple-system, sans-serif;
+html {
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-primary);
-  border-radius: var(--radius-sm);
+body {
+  font-family: var(--font-sans);
+  background: var(--black);
+  color: var(--text-1);
+  line-height: 1.55;
+  min-height: 100vh;
+  margin: 0;
 }
 
-/* Focus ring */
+/* Selection */
+::selection {
+  background: rgba(201, 165, 92, 0.25);
+  color: var(--text-1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+
+/* Focus */
 :focus-visible {
-  outline: 2px solid var(--accent-blue);
+  outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

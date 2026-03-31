@@ -4,143 +4,120 @@ import { useAccount, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
 import { addresses, rwaTokenAbi, BSC_TESTNET_EXPLORER } from "@/lib/contracts";
 
-function Skeleton() {
-  return (
-    <div className="h-5 w-24 rounded-[var(--radius-sm)] bg-[var(--border-primary)] animate-pulse" />
-  );
-}
-
 export function TokenDashboard() {
   const { address } = useAccount();
 
-  const { data: tokenName, isLoading: nameLoading } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "name",
+  const { data: tokenName } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "name",
   });
-
-  const { data: tokenSymbol, isLoading: symbolLoading } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "symbol",
+  const { data: tokenSymbol } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "symbol",
   });
-
   const { data: decimals } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "decimals",
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "decimals",
   });
-
-  const { data: balance, isLoading: balanceLoading } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
+  const { data: balance, isLoading: balLoading } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "balanceOf",
+    args: address ? [address] : undefined, query: { enabled: !!address },
   });
-
-  const { data: totalSupply, isLoading: supplyLoading } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "totalSupply",
+  const { data: totalSupply } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "totalSupply",
   });
-
-  const { data: complianceEngine } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "complianceEngine",
+  const { data: engine } = useReadContract({
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "complianceEngine",
   });
-
   const { data: paused } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "paused",
+    address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "paused",
   });
 
   const dec = typeof decimals === "number" ? decimals : 18;
-  const formattedBalance =
-    balance !== undefined ? formatUnits(balance as bigint, dec) : null;
-  const formattedSupply =
-    totalSupply !== undefined ? formatUnits(totalSupply as bigint, dec) : null;
+  const fmtBal = balance !== undefined ? Number(formatUnits(balance as bigint, dec)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—";
+  const fmtSupply = totalSupply !== undefined ? Number(formatUnits(totalSupply as bigint, dec)).toLocaleString("en-US", { minimumFractionDigits: 0 }) : "—";
 
-  const noToken = !addresses.rwaToken;
+  if (!addresses.rwaToken) {
+    return <Panel><p style={{ fontSize: 14, color: "var(--text-3)" }}>No token configured.</p></Panel>;
+  }
 
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--border-primary)] bg-[var(--bg-card)] p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold">Token Overview</h2>
+    <Panel>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sp-5)" }}>
+        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 500, color: "var(--text-1)" }}>
+          Token
+        </h2>
         {paused === true && (
-          <span className="px-2 py-1 text-xs font-medium rounded-[var(--radius-sm)] bg-[var(--accent-red)]/15 text-[var(--accent-red)] border border-[var(--accent-red)]/30">
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--red)", background: "var(--red-dim)", border: "1px solid var(--red-border)", padding: "2px 8px", letterSpacing: "0.06em", textTransform: "uppercase" }}>
             Paused
           </span>
         )}
       </div>
 
-      {noToken ? (
-        <p className="text-sm text-[var(--text-muted)]">
-          No token address configured. Set NEXT_PUBLIC_RWA_TOKEN_ADDRESS in your .env file.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-xs text-[var(--text-muted)] mb-1">Token</p>
-            {nameLoading || symbolLoading ? (
-              <Skeleton />
-            ) : (
-              <p className="text-sm font-medium">
-                {(tokenName as string) ?? "---"}{" "}
-                <span className="text-[var(--text-muted)]">
-                  ({(tokenSymbol as string) ?? "---"})
-                </span>
-              </p>
-            )}
-          </div>
+      <div style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-2)", marginBottom: "var(--sp-1)" }}>
+        {(tokenName as string) ?? "Loading..."}
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>
+          {(tokenSymbol as string) ?? ""}
+        </span>
+      </div>
 
-          <div>
-            <p className="text-xs text-[var(--text-muted)] mb-1">Your Balance</p>
-            {balanceLoading ? (
-              <Skeleton />
-            ) : (
-              <p className="text-sm font-medium tabular-nums">
-                {formattedBalance ?? "0"}{" "}
-                <span className="text-[var(--text-muted)]">
-                  {(tokenSymbol as string) ?? ""}
-                </span>
-              </p>
-            )}
-          </div>
-
-          <div>
-            <p className="text-xs text-[var(--text-muted)] mb-1">Total Supply</p>
-            {supplyLoading ? (
-              <Skeleton />
-            ) : (
-              <p className="text-sm font-medium tabular-nums">
-                {formattedSupply ?? "0"}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <p className="text-xs text-[var(--text-muted)] mb-1">
-              Compliance Engine
-            </p>
-            {complianceEngine ? (
-              <a
-                href={`${BSC_TESTNET_EXPLORER}/address/${complianceEngine}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-mono text-[var(--accent-blue)] hover:underline"
-              >
-                {(complianceEngine as string).slice(0, 6)}...
-                {(complianceEngine as string).slice(-4)}
-              </a>
-            ) : (
-              <p className="text-sm text-[var(--text-muted)]">---</p>
-            )}
-          </div>
+      {/* Balance — the hero number */}
+      <div style={{ margin: "var(--sp-5) 0" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: "var(--sp-1)" }}>
+          Your Balance
         </div>
-      )}
+        <div style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 34,
+          fontWeight: 500,
+          color: "var(--amber)",
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+          opacity: balLoading ? 0.3 : 1,
+          transition: "opacity var(--duration) var(--ease)",
+        }}>
+          {fmtBal}
+        </div>
+      </div>
+
+      {/* Meta grid */}
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "var(--sp-4)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sp-4)" }}>
+        <MetaItem label="Total Supply" value={fmtSupply} />
+        <MetaItem
+          label="Compliance Engine"
+          value={engine ? `${(engine as string).slice(0, 8)}...${(engine as string).slice(-6)}` : "—"}
+          href={engine ? `${BSC_TESTNET_EXPLORER}/address/${engine}` : undefined}
+        />
+      </div>
+    </Panel>
+  );
+}
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      background: "var(--surface-1)",
+      border: "1px solid var(--border)",
+      padding: "var(--sp-6)",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function MetaItem({ label, value, href }: { label: string; value: string; href?: string }) {
+  const val = href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--amber)", textDecoration: "none" }}>
+      {value}
+    </a>
+  ) : <span>{value}</span>;
+
+  return (
+    <div>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: "var(--sp-1)" }}>
+        {label}
+      </div>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-2)", fontVariantNumeric: "tabular-nums" }}>
+        {val}
+      </div>
     </div>
   );
 }

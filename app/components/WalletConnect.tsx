@@ -14,23 +14,39 @@ export function WalletConnect() {
 
   if (isConnected && address) {
     return (
-      <div className="flex items-center gap-3">
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-2)" }}>
         {wrongChain && (
           <button
             onClick={() => switchChain({ chainId: bscTestnet.id })}
-            className="px-3 py-2 text-sm font-medium rounded-[var(--radius-sm)] bg-[var(--accent-amber)] text-black hover:opacity-90 transition-opacity duration-[var(--duration-fast)] ease-out"
-            style={{ minHeight: 44 }}
+            style={{
+              fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500,
+              color: "var(--black)", background: "#f59e0b", border: "none",
+              padding: "8px 14px", cursor: "pointer", minHeight: 40,
+            }}
           >
-            Switch to BSC Testnet
+            Switch Network
           </button>
         )}
-        <div className="px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--bg-card)] border border-[var(--border-primary)] text-sm text-[var(--text-secondary)]">
+        <div style={{
+          display: "flex", alignItems: "center", gap: "var(--sp-2)",
+          fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-2)",
+          background: "var(--surface-2)", border: "1px solid var(--border)",
+          padding: "8px 14px", minHeight: 40,
+        }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
           {address.slice(0, 6)}...{address.slice(-4)}
         </div>
         <button
           onClick={() => disconnect()}
-          className="px-3 py-2 text-sm font-medium rounded-[var(--radius-sm)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-red)] transition-colors duration-[var(--duration-fast)] ease-out active:scale-[0.97]"
-          style={{ minHeight: 44 }}
+          style={{
+            fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500,
+            color: "var(--text-3)", background: "transparent",
+            border: "1px solid var(--border)", padding: "8px 14px",
+            cursor: "pointer", minHeight: 40,
+            transition: "color var(--duration) var(--ease), border-color var(--duration) var(--ease)",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--red)"; e.currentTarget.style.borderColor = "var(--red-border)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.borderColor = "var(--border)"; }}
         >
           Disconnect
         </button>
@@ -40,7 +56,7 @@ export function WalletConnect() {
 
   if (connectors.length === 0) {
     return (
-      <span className="px-4 py-2 text-sm text-[var(--text-muted)] rounded-[var(--radius-sm)] border border-[var(--border-primary)]">
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-3)", padding: "8px 14px", border: "1px solid var(--border)" }}>
         No wallet detected
       </span>
     );
@@ -50,8 +66,13 @@ export function WalletConnect() {
     <button
       onClick={() => connect({ connector: connectors[0] })}
       disabled={isPending}
-      className="px-4 py-2 text-sm font-medium rounded-[var(--radius-sm)] bg-[var(--accent-blue)] text-white hover:opacity-90 transition-opacity duration-[var(--duration-fast)] ease-out disabled:opacity-50 active:scale-[0.97]"
-      style={{ minHeight: 44 }}
+      style={{
+        fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 500,
+        color: "var(--black)", background: "var(--amber)", border: "none",
+        padding: "10px 20px", cursor: isPending ? "not-allowed" : "pointer",
+        opacity: isPending ? 0.5 : 1, minHeight: 44,
+        transition: "opacity var(--duration) var(--ease)",
+      }}
     >
       {isPending ? "Connecting..." : "Connect Wallet"}
     </button>

@@ -1,93 +1,72 @@
 "use client";
 
 import { useState } from "react";
-import {
-  useAccount,
-  useReadContract,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseUnits, isAddress, type Address, toHex } from "viem";
-import {
-  addresses,
-  rwaTokenAbi,
-  complianceEngineAbi,
-  countryRestrictionAbi,
-  BSC_TESTNET_EXPLORER,
-} from "@/lib/contracts";
+import { addresses, rwaTokenAbi, complianceEngineAbi, countryRestrictionAbi, BSC_TESTNET_EXPLORER } from "@/lib/contracts";
 import { useToast } from "./Toast";
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function Label({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-sm font-semibold text-[var(--text-secondary)] mb-3 mt-6 first:mt-0">
+    <label style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: "var(--sp-2)" }}>
       {children}
-    </h3>
+    </label>
   );
 }
 
-function TxLink({ hash }: { hash: string | undefined }) {
-  if (!hash) return null;
+function Input({ value, onChange, placeholder, mono = true, style: extra }: { value: string; onChange: (v: string) => void; placeholder: string; mono?: boolean; style?: React.CSSProperties }) {
   return (
-    <a
-      href={`${BSC_TESTNET_EXPLORER}/tx/${hash}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-xs text-[var(--accent-blue)] hover:underline font-mono"
-    >
-      {hash.slice(0, 10)}...{hash.slice(-8)}
-    </a>
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={{
+        width: "100%", fontFamily: mono ? "var(--font-mono)" : "var(--font-sans)", fontSize: 16,
+        color: "var(--text-1)", background: "var(--surface-2)", border: "1px solid var(--border)",
+        padding: "10px 14px", outline: "none", minHeight: 44, ...extra,
+      }}
+    />
   );
 }
 
-function ActionButton({
-  onClick,
-  disabled,
-  children,
-}: {
-  onClick: () => void;
-  disabled: boolean;
-  children: React.ReactNode;
-}) {
+function Btn({ onClick, disabled, children, variant = "primary" }: { onClick: () => void; disabled: boolean; children: React.ReactNode; variant?: "primary" | "outline" | "danger" }) {
+  const styles: Record<string, React.CSSProperties> = {
+    primary: { background: "var(--amber)", color: "var(--black)", border: "none" },
+    outline: { background: "transparent", color: "var(--text-2)", border: "1px solid var(--border)" },
+    danger: { background: "var(--red-dim)", color: "var(--red)", border: "1px solid var(--red-border)" },
+  };
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="px-4 py-2.5 text-sm font-medium rounded-[var(--radius-sm)] bg-[var(--accent-blue)] text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-[var(--duration-fast)] ease-out active:scale-[0.97]"
-      style={{ minHeight: 44 }}
+      style={{
+        fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500, padding: "8px 16px",
+        cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1,
+        minHeight: 40, flexShrink: 0, whiteSpace: "nowrap", transition: "opacity var(--duration) var(--ease)",
+        ...styles[variant],
+      }}
     >
       {children}
     </button>
   );
 }
 
-function InputField({
-  id,
-  label,
-  value,
-  onChange,
-  placeholder,
-  mono,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  mono?: boolean;
-}) {
+function TxLink({ hash }: { hash: string | undefined }) {
+  if (!hash) return null;
   return (
-    <div>
-      <label htmlFor={id} className="block text-xs text-[var(--text-muted)] mb-1.5">
-        {label}
-      </label>
-      <input
-        id={id}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`w-full px-3 py-2.5 text-sm rounded-[var(--radius-sm)] bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-blue)] transition-colors duration-[var(--duration-fast)] ease-out ${mono ? "font-mono" : ""}`}
-        style={{ fontSize: 16 }}
-      />
+    <a href={`${BSC_TESTNET_EXPLORER}/tx/${hash}`} target="_blank" rel="noopener noreferrer"
+      style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--amber)", textDecoration: "none" }}>
+      {hash.slice(0, 10)}...{hash.slice(-6)}
+    </a>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ paddingTop: "var(--sp-5)", paddingBottom: "var(--sp-5)", borderBottom: "1px solid var(--border)" }}>
+      <h3 style={{ fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 500, color: "var(--text-1)", marginBottom: "var(--sp-4)" }}>{title}</h3>
+      {children}
     </div>
   );
 }
@@ -95,373 +74,139 @@ function InputField({
 export function IssuerPanel() {
   const { address } = useAccount();
   const { toast } = useToast();
+  const { data: owner } = useReadContract({ address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "owner", query: { enabled: !!addresses.rwaToken } });
 
-  // Check ownership
-  const { data: tokenOwner } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "owner",
-    query: { enabled: !!addresses.rwaToken },
-  });
+  const isOwner = !!address && !!owner && (address as string).toLowerCase() === (owner as string).toLowerCase();
 
-  const isOwner =
-    !!address &&
-    !!tokenOwner &&
-    (address as string).toLowerCase() ===
-      (tokenOwner as string).toLowerCase();
-
-  // Mint state
   const [mintTo, setMintTo] = useState("");
-  const [mintAmount, setMintAmount] = useState("");
-  const {
-    writeContract: writeMint,
-    data: mintHash,
-    isPending: mintPending,
-  } = useWriteContract();
+  const [mintAmt, setMintAmt] = useState("");
+  const { writeContract: wMint, data: mintHash, isPending: mintP } = useWriteContract();
 
-  // Attestation state
-  const [attestWallet, setAttestWallet] = useState("");
-  const [attestUID, setAttestUID] = useState("");
-  const {
-    writeContract: writeAttest,
-    data: attestHash,
-    isPending: attestPending,
-  } = useWriteContract();
+  const [attWallet, setAttWallet] = useState("");
+  const [attUID, setAttUID] = useState("");
+  const { writeContract: wAtt, data: attHash, isPending: attP } = useWriteContract();
 
-  // Freeze state
-  const [freezeWallet, setFreezeWallet] = useState("");
-  const {
-    writeContract: writeFreeze,
-    data: freezeHash,
-    isPending: freezePending,
-  } = useWriteContract();
-  const {
-    writeContract: writeUnfreeze,
-    data: unfreezeHash,
-    isPending: unfreezePending,
-  } = useWriteContract();
+  const [freezeAddr, setFreezeAddr] = useState("");
+  const { writeContract: wFreeze, data: freezeHash, isPending: freezeP } = useWriteContract();
+  const { writeContract: wUnfreeze, data: unfreezeHash, isPending: unfreezeP } = useWriteContract();
 
-  // Country state
-  const [countryCode, setCountryCode] = useState("");
-  const {
-    writeContract: writeBlock,
-    data: blockHash,
-    isPending: blockPending,
-  } = useWriteContract();
-  const {
-    writeContract: writeUnblock,
-    data: unblockHash,
-    isPending: unblockPending,
-  } = useWriteContract();
+  const [country, setCountry] = useState("");
+  const { writeContract: wBlock, data: blockHash, isPending: blockP } = useWriteContract();
+  const { writeContract: wUnblock, data: unblockHash, isPending: unblockP } = useWriteContract();
 
-  // Read blocked countries
-  const { data: blockedCountries } = useReadContract({
-    address: addresses.countryRestriction,
-    abi: countryRestrictionAbi,
-    functionName: "getBlockedCountries",
-    query: { enabled: !!addresses.countryRestriction },
-  });
-
-  // Read modules
-  const { data: modules } = useReadContract({
-    address: addresses.complianceEngine,
-    abi: complianceEngineAbi,
-    functionName: "getModules",
-    query: { enabled: !!addresses.complianceEngine },
-  });
-
-  const { data: decimals } = useReadContract({
-    address: addresses.rwaToken,
-    abi: rwaTokenAbi,
-    functionName: "decimals",
-  });
-
+  const { data: blocked } = useReadContract({ address: addresses.countryRestriction, abi: countryRestrictionAbi, functionName: "getBlockedCountries", query: { enabled: !!addresses.countryRestriction } });
+  const { data: decimals } = useReadContract({ address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "decimals" });
   const dec = typeof decimals === "number" ? decimals : 18;
 
   if (!isOwner) return null;
 
-  function handleMint() {
-    if (!isAddress(mintTo) || !mintAmount) return;
-    writeMint(
-      {
-        address: addresses.rwaToken,
-        abi: rwaTokenAbi,
-        functionName: "mint",
-        args: [mintTo as Address, parseUnits(mintAmount, dec)],
-      },
-      {
-        onSuccess: () => toast("Mint tx submitted", "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doMint() {
+    if (!isAddress(mintTo) || !mintAmt) return;
+    wMint({ address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "mint", args: [mintTo as Address, parseUnits(mintAmt, dec)] },
+      { onSuccess: () => toast("Minted", "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function handleSetAttestation() {
-    if (!isAddress(attestWallet) || !attestUID) return;
-    const uid = attestUID.startsWith("0x")
-      ? (attestUID as `0x${string}`)
-      : (`0x${attestUID}` as `0x${string}`);
-    writeAttest(
-      {
-        address: addresses.complianceEngine,
-        abi: complianceEngineAbi,
-        functionName: "setAttestationUID",
-        args: [attestWallet as Address, uid],
-      },
-      {
-        onSuccess: () => toast("Attestation set", "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doAtt() {
+    if (!isAddress(attWallet) || !attUID) return;
+    const uid = attUID.startsWith("0x") ? (attUID as `0x${string}`) : (`0x${attUID}` as `0x${string}`);
+    wAtt({ address: addresses.complianceEngine, abi: complianceEngineAbi, functionName: "setAttestationUID", args: [attWallet as Address, uid] },
+      { onSuccess: () => toast("Attestation set", "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function handleFreeze() {
-    if (!isAddress(freezeWallet)) return;
-    writeFreeze(
-      {
-        address: addresses.rwaToken,
-        abi: rwaTokenAbi,
-        functionName: "freezeAddress",
-        args: [freezeWallet as Address],
-      },
-      {
-        onSuccess: () => toast("Address frozen", "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doFreeze() {
+    if (!isAddress(freezeAddr)) return;
+    wFreeze({ address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "freezeAddress", args: [freezeAddr as Address] },
+      { onSuccess: () => toast("Frozen", "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function handleUnfreeze() {
-    if (!isAddress(freezeWallet)) return;
-    writeUnfreeze(
-      {
-        address: addresses.rwaToken,
-        abi: rwaTokenAbi,
-        functionName: "unfreezeAddress",
-        args: [freezeWallet as Address],
-      },
-      {
-        onSuccess: () => toast("Address unfrozen", "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doUnfreeze() {
+    if (!isAddress(freezeAddr)) return;
+    wUnfreeze({ address: addresses.rwaToken, abi: rwaTokenAbi, functionName: "unfreezeAddress", args: [freezeAddr as Address] },
+      { onSuccess: () => toast("Unfrozen", "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function handleBlockCountry() {
-    if (countryCode.length !== 2) return;
-    const bytes2 = toHex(new TextEncoder().encode(countryCode.toUpperCase())) as `0x${string}`;
-    writeBlock(
-      {
-        address: addresses.countryRestriction,
-        abi: countryRestrictionAbi,
-        functionName: "blockCountry",
-        args: [bytes2],
-      },
-      {
-        onSuccess: () => toast(`Country ${countryCode.toUpperCase()} blocked`, "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doBlock() {
+    if (country.length !== 2) return;
+    const b = toHex(new TextEncoder().encode(country.toUpperCase())) as `0x${string}`;
+    wBlock({ address: addresses.countryRestriction, abi: countryRestrictionAbi, functionName: "blockCountry", args: [b] },
+      { onSuccess: () => toast(`${country.toUpperCase()} blocked`, "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function handleUnblockCountry() {
-    if (countryCode.length !== 2) return;
-    const bytes2 = toHex(new TextEncoder().encode(countryCode.toUpperCase())) as `0x${string}`;
-    writeUnblock(
-      {
-        address: addresses.countryRestriction,
-        abi: countryRestrictionAbi,
-        functionName: "unblockCountry",
-        args: [bytes2],
-      },
-      {
-        onSuccess: () => toast(`Country ${countryCode.toUpperCase()} unblocked`, "success"),
-        onError: (e) => toast(e.message.split("\n")[0], "error"),
-      }
-    );
+  function doUnblock() {
+    if (country.length !== 2) return;
+    const b = toHex(new TextEncoder().encode(country.toUpperCase())) as `0x${string}`;
+    wUnblock({ address: addresses.countryRestriction, abi: countryRestrictionAbi, functionName: "unblockCountry", args: [b] },
+      { onSuccess: () => toast(`${country.toUpperCase()} unblocked`, "success"), onError: (e) => toast(e.message.split("\n")[0], "error") });
   }
 
-  function decodeCountryBytes(hex: string): string {
+  function decodeCountry(hex: string): string {
     try {
-      const bytes = hex.startsWith("0x") ? hex.slice(2) : hex;
-      const first = parseInt(bytes.slice(0, 2), 16);
-      const second = parseInt(bytes.slice(2, 4), 16);
-      return String.fromCharCode(first) + String.fromCharCode(second);
-    } catch {
-      return hex;
-    }
+      const b = hex.startsWith("0x") ? hex.slice(2) : hex;
+      return String.fromCharCode(parseInt(b.slice(0, 2), 16)) + String.fromCharCode(parseInt(b.slice(2, 4), 16));
+    } catch { return hex; }
   }
 
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--accent-purple)]/30 bg-[var(--bg-card)] p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <h2 className="text-lg font-semibold">Issuer Admin</h2>
-        <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-[var(--radius-sm)] bg-[var(--accent-purple)]/15 text-[var(--accent-purple)] border border-[var(--accent-purple)]/30">
+    <div style={{ background: "var(--surface-1)", border: "1px solid var(--amber-border)", padding: "var(--sp-6)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-3)", marginBottom: "var(--sp-2)" }}>
+        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 500, color: "var(--text-1)" }}>Issuer Admin</h2>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--amber)", background: "var(--amber-dim)", border: "1px solid var(--amber-border)", padding: "2px 8px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
           Owner
         </span>
       </div>
 
-      {/* Mint Tokens */}
-      <SectionTitle>Mint Tokens</SectionTitle>
-      <div className="space-y-3">
-        <InputField
-          id="mint-to"
-          label="Recipient"
-          value={mintTo}
-          onChange={setMintTo}
-          placeholder="0x..."
-          mono
-        />
-        <InputField
-          id="mint-amount"
-          label="Amount"
-          value={mintAmount}
-          onChange={(v) => setMintAmount(v.replace(/[^0-9.]/g, ""))}
-          placeholder="1000"
-        />
-        <div className="flex items-center gap-3">
-          <ActionButton
-            onClick={handleMint}
-            disabled={!isAddress(mintTo) || !mintAmount || mintPending}
-          >
-            {mintPending ? "Minting..." : "Mint"}
-          </ActionButton>
-          <TxLink hash={mintHash} />
+      <Section title="Mint Tokens">
+        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}><Label>Recipient</Label><Input value={mintTo} onChange={setMintTo} placeholder="0x..." /></div>
+          <div style={{ width: 140 }}><Label>Amount</Label><Input value={mintAmt} onChange={(v) => setMintAmt(v.replace(/[^0-9.]/g, ""))} placeholder="1000" /></div>
+          <Btn onClick={doMint} disabled={!isAddress(mintTo) || !mintAmt || mintP}>{mintP ? "..." : "Mint"}</Btn>
         </div>
-      </div>
+        <div style={{ marginTop: "var(--sp-2)" }}><TxLink hash={mintHash} /></div>
+      </Section>
 
-      {/* Set Attestation UID */}
-      <SectionTitle>Set Attestation UID</SectionTitle>
-      <div className="space-y-3">
-        <InputField
-          id="attest-wallet"
-          label="Wallet Address"
-          value={attestWallet}
-          onChange={setAttestWallet}
-          placeholder="0x..."
-          mono
-        />
-        <InputField
-          id="attest-uid"
-          label="Attestation UID (bytes32)"
-          value={attestUID}
-          onChange={setAttestUID}
-          placeholder="0x..."
-          mono
-        />
-        <div className="flex items-center gap-3">
-          <ActionButton
-            onClick={handleSetAttestation}
-            disabled={
-              !isAddress(attestWallet) || !attestUID || attestPending
-            }
-          >
-            {attestPending ? "Setting..." : "Set Attestation"}
-          </ActionButton>
-          <TxLink hash={attestHash} />
+      <Section title="Set Attestation UID">
+        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}><Label>Wallet</Label><Input value={attWallet} onChange={setAttWallet} placeholder="0x..." /></div>
+          <div style={{ flex: 1 }}><Label>UID (bytes32)</Label><Input value={attUID} onChange={setAttUID} placeholder="0x..." /></div>
+          <Btn onClick={doAtt} disabled={!isAddress(attWallet) || !attUID || attP}>{attP ? "..." : "Set"}</Btn>
         </div>
-      </div>
+        <div style={{ marginTop: "var(--sp-2)" }}><TxLink hash={attHash} /></div>
+      </Section>
 
-      {/* Freeze/Unfreeze */}
-      <SectionTitle>Freeze / Unfreeze Address</SectionTitle>
-      <div className="space-y-3">
-        <InputField
-          id="freeze-wallet"
-          label="Wallet Address"
-          value={freezeWallet}
-          onChange={setFreezeWallet}
-          placeholder="0x..."
-          mono
-        />
-        <div className="flex items-center gap-3">
-          <ActionButton
-            onClick={handleFreeze}
-            disabled={!isAddress(freezeWallet) || freezePending}
-          >
-            {freezePending ? "Freezing..." : "Freeze"}
-          </ActionButton>
-          <ActionButton
-            onClick={handleUnfreeze}
-            disabled={!isAddress(freezeWallet) || unfreezePending}
-          >
-            {unfreezePending ? "Unfreezing..." : "Unfreeze"}
-          </ActionButton>
-          <TxLink hash={freezeHash || unfreezeHash} />
+      <Section title="Freeze / Unfreeze">
+        <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}><Label>Address</Label><Input value={freezeAddr} onChange={setFreezeAddr} placeholder="0x..." /></div>
+          <Btn onClick={doFreeze} disabled={!isAddress(freezeAddr) || freezeP}>{freezeP ? "..." : "Freeze"}</Btn>
+          <Btn onClick={doUnfreeze} disabled={!isAddress(freezeAddr) || unfreezeP} variant="danger">{unfreezeP ? "..." : "Unfreeze"}</Btn>
         </div>
-      </div>
+        <div style={{ marginTop: "var(--sp-2)" }}><TxLink hash={freezeHash || unfreezeHash} /></div>
+      </Section>
 
-      {/* Country Restriction */}
       {addresses.countryRestriction && (
-        <>
-          <SectionTitle>Country Restrictions</SectionTitle>
-          <div className="space-y-3">
-            <InputField
-              id="country-code"
-              label="Country Code (e.g. US, KP)"
-              value={countryCode}
-              onChange={(v) => setCountryCode(v.toUpperCase().slice(0, 2))}
-              placeholder="US"
-            />
-            <div className="flex items-center gap-3">
-              <ActionButton
-                onClick={handleBlockCountry}
-                disabled={countryCode.length !== 2 || blockPending}
-              >
-                {blockPending ? "Blocking..." : "Block"}
-              </ActionButton>
-              <ActionButton
-                onClick={handleUnblockCountry}
-                disabled={countryCode.length !== 2 || unblockPending}
-              >
-                {unblockPending ? "Unblocking..." : "Unblock"}
-              </ActionButton>
-              <TxLink hash={blockHash || unblockHash} />
+        <Section title="Country Restrictions">
+          {Array.isArray(blocked) && blocked.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-2)", marginBottom: "var(--sp-4)" }}>
+              {(blocked as string[]).map((c: string, i: number) => (
+                <span key={i} style={{
+                  fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 500, color: "var(--red)",
+                  background: "var(--red-dim)", border: "1px solid var(--red-border)", padding: "3px 10px",
+                  letterSpacing: "0.04em",
+                }}>
+                  {decodeCountry(c)}
+                </span>
+              ))}
             </div>
-
-            {Array.isArray(blockedCountries) && blockedCountries.length > 0 ? (
-              <div className="mt-2">
-                <p className="text-xs text-[var(--text-muted)] mb-1.5">
-                  Blocked Countries
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {(blockedCountries as string[]).map((c: string, i: number) => (
-                    <span
-                      key={i}
-                      className="px-2 py-0.5 text-xs font-mono rounded-[var(--radius-sm)] bg-[var(--accent-red)]/10 text-[var(--accent-red)] border border-[var(--accent-red)]/20"
-                    >
-                      {decodeCountryBytes(c)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null}
+          )}
+          <div style={{ display: "flex", gap: "var(--sp-3)", alignItems: "flex-end" }}>
+            <div style={{ width: 100 }}>
+              <Label>Code</Label>
+              <Input value={country} onChange={(v) => setCountry(v.toUpperCase().slice(0, 2))} placeholder="US" style={{ textTransform: "uppercase" }} />
+            </div>
+            <Btn onClick={doBlock} disabled={country.length !== 2 || blockP} variant="danger">{blockP ? "..." : "Block"}</Btn>
+            <Btn onClick={doUnblock} disabled={country.length !== 2 || unblockP} variant="outline">{unblockP ? "..." : "Unblock"}</Btn>
           </div>
-        </>
-      )}
-
-      {/* Registered Modules */}
-      <SectionTitle>Compliance Modules</SectionTitle>
-      {modules && (modules as string[]).length > 0 ? (
-        <div className="space-y-1.5">
-          {(modules as string[]).map((mod, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 py-1.5 px-3 rounded-[var(--radius-sm)] bg-[var(--bg-secondary)] border border-[var(--border-primary)]"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)]" />
-              <a
-                href={`${BSC_TESTNET_EXPLORER}/address/${mod}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-mono text-[var(--accent-blue)] hover:underline"
-              >
-                {mod}
-              </a>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-xs text-[var(--text-muted)]">No modules registered</p>
+          <div style={{ marginTop: "var(--sp-2)" }}><TxLink hash={blockHash || unblockHash} /></div>
+        </Section>
       )}
     </div>
   );
