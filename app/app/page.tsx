@@ -45,6 +45,25 @@ function GateHero() {
         </span>
       </div>
 
+      {/* Hero footer — visible without wallet */}
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20,
+        display: "flex", justifyContent: "center", gap: "var(--sp-6)", padding: "var(--sp-4)",
+        borderTop: "1px solid var(--border)",
+      }}>
+        <a href="https://github.com/Yonkoo11/verigate" target="_blank" rel="noopener noreferrer"
+          style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textDecoration: "none" }}>
+          GitHub
+        </a>
+        <a href="https://testnet.bscscan.com/address/0x60aa769416EfBbc0A6BC9cb454758dE6f76D52B5" target="_blank" rel="noopener noreferrer"
+          style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textDecoration: "none" }}>
+          BSCScan
+        </a>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-4)" }}>
+          Built on BNB Chain
+        </span>
+      </div>
+
       {/* RIGHT: Approved zone */}
       <div className="gate-hero-approved">
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--amber-glow), transparent)", pointerEvents: "none" }} />
