@@ -1,4 +1,4 @@
-# RWA Gateway
+# Verigate
 
 Lightweight, BNB-native compliance middleware for tokenized real-world assets. Uses [BAS (BNB Attestation Service)](https://www.bnbattest.io/) for identity verification and modular compliance rules.
 

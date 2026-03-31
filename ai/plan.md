@@ -1,4 +1,4 @@
-# RWA Gateway — Build Plan
+# Verigate — Build Plan
 
 ## Build Order (enforced)
 1. Core action works end-to-end (contracts deploy, transfer blocked/allowed based on BAS attestation)

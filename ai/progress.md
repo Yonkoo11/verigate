@@ -1,4 +1,4 @@
-# RWA Gateway — Progress
+# Verigate — Progress
 
 ## Status: PHASE 1 GATE PASSED. Deployed and verified on BSC testnet.
 
@@ -30,13 +30,20 @@
 - [x] Next.js frontend built (wagmi/viem)
 - [x] Frontend .env.local configured with deployed addresses
 
+## What's Done Since Last Update
+- [x] RWATokenFactory verified on BSCScan
+- [x] README with architecture, contract addresses, setup instructions
+- [x] Git repo initialized, committed, pushed to https://github.com/Yonkoo11/rwa-gateway
+- [x] .env.example files for contracts and frontend
+- [x] No secrets in git (verified)
+
 ## What's NOT Done
-- [ ] Test frontend against live contracts (dev server)
 - [ ] Pitch deck
 - [ ] DoraHacks BUIDL page + Google Form submission
 - [ ] Demo video
+- [ ] Frontend live testing (dev server starts clean, not browser-tested)
 
 ## Next Steps
-1. Run frontend dev server and test against live contracts
-2. Build pitch deck
-3. Submit to DoraHacks
+1. Build pitch deck
+2. Submit to DoraHacks
+3. Test frontend in browser

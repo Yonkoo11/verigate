@@ -21,8 +21,8 @@ function HeroSection() {
       </h1>
 
       <p className="text-lg text-[var(--text-secondary)] max-w-lg mx-auto mb-8 leading-relaxed">
-        BNB-native compliance middleware powered by BAS attestations.
-        Transfer restrictions that work for issuers and DeFi.
+        Verify before you transfer. BNB-native compliance
+        powered by BAS attestations.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">

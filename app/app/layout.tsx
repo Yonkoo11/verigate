@@ -5,8 +5,8 @@ import { WalletConnect } from "@/components/WalletConnect";
 import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
-  title: "RWA Gateway",
-  description: "Compliance middleware for tokenized real-world assets on BNB Chain",
+  title: "Verigate",
+  description: "Verify before you transfer. Compliance middleware for tokenized RWA on BNB Chain.",
 };
 
 export default function RootLayout({
@@ -23,10 +23,10 @@ export default function RootLayout({
               <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-purple)] flex items-center justify-center text-white text-xs font-bold">
-                    RG
+                    VG
                   </div>
                   <span className="text-lg font-semibold text-[var(--text-primary)]">
-                    RWA Gateway
+                    Verigate
                   </span>
                   <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-[var(--radius-sm)] bg-[var(--accent-purple)]/15 text-[var(--accent-purple)] border border-[var(--accent-purple)]/30">
                     Testnet

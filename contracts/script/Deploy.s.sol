@@ -45,8 +45,8 @@ contract Deploy is Script {
 
         (address token, address engine) = factory.deploy(
             RWATokenFactory.DeployParams({
-                name: "RWA Gateway Demo Token",
-                symbol: "rwGATE",
+                name: "Verigate Demo Token",
+                symbol: "VGATE",
                 useCountryRestriction: true,
                 countryCheckSender: true,
                 blockedCountries: blockedCountries,

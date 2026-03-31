@@ -1,4 +1,4 @@
-# RWA Gateway — AI Memory
+# Verigate — AI Memory
 
 ## Phase 1 Gate (MUST PASS BEFORE ANY OTHER WORK)
 Core Action: Transfer of an RWA token gets blocked because recipient lacks a BAS KYC attestation, then succeeds after attestation is added
