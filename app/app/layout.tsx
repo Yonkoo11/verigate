@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Verigate",
   description: "Verify before you transfer. Compliance middleware for tokenized RWA on BNB Chain.",
   icons: { icon: "/favicon.svg" },
+  other: { "theme-color": "#0b0d11" },
 };
 
 export default function RootLayout({

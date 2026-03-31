@@ -40,8 +40,18 @@ function GateHero() {
       <div className="gate-line">
         <div className="gate-line-bar" />
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--amber)", boxShadow: "0 0 20px rgba(201,165,92,0.35)", zIndex: 1 }} />
-        <span className="gate-label" style={{ position: "absolute", fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--amber)", opacity: 0.45, writingMode: "vertical-rl", transform: "rotate(180deg) translateY(-40px)" }}>
+        <span className="gate-label">
           Verigate
+        </span>
+      </div>
+
+      {/* Central tagline — the one thing a judge reads */}
+      <div style={{
+        position: "absolute", top: "var(--sp-8)", left: 0, right: 0, zIndex: 20,
+        textAlign: "center",
+      }}>
+        <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 500, color: "var(--text-2)", letterSpacing: "0.01em" }}>
+          Compliance middleware for tokenized real-world assets
         </span>
       </div>
 
@@ -59,7 +69,7 @@ function GateHero() {
           style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textDecoration: "none" }}>
           BSCScan
         </a>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-4)" }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)" }}>
           Built on BNB Chain
         </span>
       </div>
