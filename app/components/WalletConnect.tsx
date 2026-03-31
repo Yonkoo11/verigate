@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
 
@@ -11,6 +12,13 @@ export function WalletConnect() {
   const { switchChain } = useSwitchChain();
 
   const wrongChain = isConnected && chainId !== bscTestnet.id;
+
+  // Auto-switch to BSC Testnet when connected on wrong chain
+  useEffect(() => {
+    if (wrongChain && switchChain) {
+      switchChain({ chainId: bscTestnet.id });
+    }
+  }, [wrongChain, switchChain]);
 
   if (isConnected && address) {
     return (
@@ -24,7 +32,7 @@ export function WalletConnect() {
               padding: "8px 14px", cursor: "pointer", minHeight: 40,
             }}
           >
-            Switch Network
+            Switch to BSC Testnet
           </button>
         )}
         <div style={{
@@ -33,7 +41,10 @@ export function WalletConnect() {
           background: "var(--surface-2)", border: "1px solid var(--border)",
           padding: "8px 14px", minHeight: 40,
         }}>
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
+          <div style={{
+            width: 7, height: 7, borderRadius: "50%", flexShrink: 0,
+            background: wrongChain ? "#f59e0b" : "var(--green)",
+          }} />
           {address.slice(0, 6)}...{address.slice(-4)}
         </div>
         <button
@@ -64,7 +75,7 @@ export function WalletConnect() {
 
   return (
     <button
-      onClick={() => connect({ connector: connectors[0] })}
+      onClick={() => connect({ connector: connectors[0], chainId: bscTestnet.id })}
       disabled={isPending}
       style={{
         fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 500,
