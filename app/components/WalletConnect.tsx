@@ -38,6 +38,14 @@ export function WalletConnect() {
     );
   }
 
+  if (connectors.length === 0) {
+    return (
+      <span className="px-4 py-2 text-sm text-[var(--text-muted)] rounded-[var(--radius-sm)] border border-[var(--border-primary)]">
+        No wallet detected
+      </span>
+    );
+  }
+
   return (
     <button
       onClick={() => connect({ connector: connectors[0] })}
