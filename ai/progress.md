@@ -25,7 +25,13 @@
 - [x] GitHub Pages deployed
 - [x] Submission content prepared (ai/submission.md)
 
+## What's Done Since Last Update
+- [x] Pitch deck (10 slides, PDF generated, reviewed slide-by-slide)
+- [x] Form fields prepared (ai/form-fields.md)
+- [x] Frontend design reviewed and validated (gate hero, WCAG contrast, responsive)
+
 ## What's NOT Done
 - [ ] DoraHacks BUIDL page (user must create — requires authentication)
-- [ ] Google Form submission (user must fill)
-- [ ] Pitch deck (for April 8 pitch day — not required for March 31 submission)
+- [ ] Google Form submission (user must fill — ai/form-fields.md has all content)
+- [ ] Demo video (use /demo-video when ready)
+- [ ] Pitch deck improvement: add product screenshot + architecture diagram before April 8

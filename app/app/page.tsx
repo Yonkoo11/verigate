@@ -1,17 +1,18 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import { TokenDashboard } from "@/components/TokenDashboard";
 import { ComplianceStatus } from "@/components/ComplianceStatus";
 import { TransferForm } from "@/components/TransferForm";
 import { IssuerPanel } from "@/components/IssuerPanel";
 
 function GateHero() {
+  const { connect, connectors } = useConnect();
   return (
     <div className="gate-hero">
       {/* LEFT: Denied zone */}
       <div className="gate-hero-denied">
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--text-4)", marginBottom: 28 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 28 }}>
           Without verification
         </span>
         <div style={{ width: 44, height: 44, border: "1px solid var(--red-border)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
@@ -37,7 +38,7 @@ function GateHero() {
 
       {/* GATE LINE */}
       <div className="gate-line">
-        <div className="gate-line-vertical" style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "var(--amber-border)", transform: "translateX(-50%)" }} />
+        <div className="gate-line-bar" />
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--amber)", boxShadow: "0 0 20px rgba(201,165,92,0.35)", zIndex: 1 }} />
         <span className="gate-label" style={{ position: "absolute", fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--amber)", opacity: 0.45, writingMode: "vertical-rl", transform: "rotate(180deg) translateY(-40px)" }}>
           Verigate
@@ -62,7 +63,12 @@ function GateHero() {
           <p style={{ fontSize: 15, color: "var(--text-2)", maxWidth: 340, lineHeight: 1.6 }}>
             All compliance modules passed. BAS attestation verified for both parties.
           </p>
-          <button style={{ marginTop: 40, fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 500, color: "var(--black)", background: "var(--amber)", border: "none", padding: "14px 32px", cursor: "pointer", minHeight: 48 }}>
+          <button
+            onClick={() => connectors[0] && connect({ connector: connectors[0] })}
+            style={{ marginTop: 40, fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 500, color: "var(--black)", background: "var(--amber)", border: "none", padding: "14px 32px", cursor: "pointer", minHeight: 48, transition: "opacity var(--duration) var(--ease)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+          >
             Connect Wallet
           </button>
         </div>
@@ -75,7 +81,7 @@ function Dashboard() {
   return (
     <div style={{ maxWidth: 1120, margin: "0 auto", padding: "var(--sp-8) var(--sp-6) var(--sp-16)" }}>
       <h1 style={{ fontFamily: "var(--font-serif)", fontSize: 26, fontWeight: 500, color: "var(--text-1)", marginBottom: "var(--sp-8)", letterSpacing: "-0.01em" }}>
-        Dashboard
+        Compliance Dashboard
       </h1>
       <div className="dash-grid">
         <TokenDashboard />
@@ -90,6 +96,21 @@ function Dashboard() {
         </div>
       </div>
       <IssuerPanel />
+
+      {/* Footer */}
+      <footer style={{ marginTop: "var(--sp-16)", paddingTop: "var(--sp-6)", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "var(--sp-4)" }}>
+        <span style={{ fontFamily: "var(--font-serif)", fontSize: 14, color: "var(--text-3)" }}>
+          Verigate — Compliance for tokenized RWA on BNB Chain
+        </span>
+        <div style={{ display: "flex", gap: "var(--sp-5)" }}>
+          <a href="https://github.com/Yonkoo11/verigate" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textDecoration: "none" }}>
+            GitHub
+          </a>
+          <a href="https://testnet.bscscan.com/address/0x60aa769416EfBbc0A6BC9cb454758dE6f76D52B5" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)", textDecoration: "none" }}>
+            BSCScan
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

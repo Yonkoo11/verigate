@@ -55,7 +55,7 @@ export function TransferForm() {
   const valid = isAddress(recipient) && parseFloat(amount) > 0;
 
   return (
-    <div style={{ background: "var(--surface-1)", border: "1px solid var(--border)", padding: "var(--sp-6)" }}>
+    <div style={{ background: "var(--surface-1)", border: "1px solid var(--amber-border)", padding: "var(--sp-6)" }}>
       <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 20, fontWeight: 500, color: "var(--text-1)", marginBottom: "var(--sp-5)" }}>
         Transfer
       </h2>
